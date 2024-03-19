@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -75,3 +76,37 @@ def add_user_to_shift(request, id):
     shift_user.save()
 
     return Response({"data": {"id_user": user.id, "status": "added"}}, status=status.HTTP_200_OK)
+
+
+def view_orders_for_shift(request, id):
+    try:
+        work_shift = WorkShift.objects.get(id=id)
+    except WorkShift.DoesNotExist:
+        return JsonResponse({"error": "WorkShift not found"}, status=404)
+
+    orders = work_shift.order_set.all()
+
+    orders_data = []
+    total_amount = 0
+    for order in orders:
+        order_data = {
+            "id": order.id,
+            "table": order.table,
+            "shift_workers": order.shift_workers,
+            "created_at": order.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "status": order.status,
+            "price": order.price
+        }
+        orders_data.append(order_data)
+        total_amount += order.price
+
+    shift_data = {
+        "id": work_shift.id,
+        "start": work_shift.start.strftime("%Y-%m-%d %H:%M:%S"),
+        "end": work_shift.end.strftime("%Y-%m-%d %H:%M:%S"),
+        "active": work_shift.active,
+        "orders": orders_data,
+        "amount_for_all": total_amount
+    }
+
+    return JsonResponse({"data": shift_data})

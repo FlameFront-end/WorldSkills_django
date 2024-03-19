@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user.apps.UserConfig',
     'work_shift.apps.WorkShiftConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -47,9 +48,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'WorldSkills_django.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 TEMPLATES = [
     {
